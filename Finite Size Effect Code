@@ -28,3 +28,14 @@ plt.xlabel('Radius (nm)')
 plt.ylabel('Mean % Change between R and R - 1')
 plt.yscale('log')
 plt.grid()
+
+
+
+##Checks the LDOS Plot for R = 34
+energy_range = np.linspace(-10, 10, 1000)
+ldos1 = kpmR0.calc_ldos(energy=energy_range, broadening=0.03, position=[0, 0])
+plt.figure(figsize=(12,8))
+ldos1.plot()
+plt.legend()
+plt.title('LDOS for R = 34')
+plt.show()
