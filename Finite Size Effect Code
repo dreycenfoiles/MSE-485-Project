@@ -1,0 +1,41 @@
+R = np.linspace(10, 50, 41)
+errarray = np.zeros(41)
+
+for i in range(10, 51):
+    modelR0 = pb.Model(
+        graphene.monolayer(),
+        pb.circle(radius=i)
+    )
+    kpmR0 = pb.kpm(modelR0)
+    
+    modelR1 = pb.Model(
+        graphene.monolayer(),
+        pb.circle(radius= i + 1)
+    )
+    kpmR1 = pb.kpm(modelR1)
+    
+    ldos_R0 = kpmR0.calc_ldos(energy=np.linspace(-2, 2, 500),
+                                 broadening=0.03, position=[0, 0])
+
+    ldos_R1 = kpmR1.calc_ldos(energy=np.linspace(-2, 2, 500),
+                                       broadening=0.03, position=[0, 0])
+
+    errarray[i-10] = np.mean( abs(ldos_R1.data - ldos_R0.data)/ldos_R0.data )
+
+plt.scatter(R + 1, errarray*100, s = 2)
+plt.title('LDOS Error vs Radius')
+plt.xlabel('Radius (nm)')
+plt.ylabel('Mean % Change between R and R - 1')
+plt.yscale('log')
+plt.grid()
+
+
+
+##Checks the LDOS Plot for R = 34
+energy_range = np.linspace(-10, 10, 1000)
+ldos1 = kpmR0.calc_ldos(energy=energy_range, broadening=0.03, position=[0, 0])
+plt.figure(figsize=(12,8))
+ldos1.plot()
+plt.legend()
+plt.title('LDOS for R = 34')
+plt.show()
