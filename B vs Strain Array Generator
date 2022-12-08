@@ -1,0 +1,33 @@
+##Generates magnetic fields minimizing the difference between LDOS plots for uniaxial strains with c-values from 0.0005 to 0.01 in increments of 0.0005
+B = np.zeros(20)
+for i in range (1, 21):
+    c0 = i*0.001/2
+    def ldos_diff(B0):
+        model_mag = pb.Model(
+            graphene.monolayer(),
+            pb.circle(radius=30),
+            constant_magnetic_field(B=B0)  # Tesla
+        )
+        kpm_mag = pb.kpm(model_mag)
+    
+        model_strain = pb.Model(
+            graphene.monolayer(),
+            pb.circle(radius=30),
+            uniaxial_strain(c=c0)
+        )
+        kpm_strain = pb.kpm(model_strain)
+    
+        ldos_mag = kpm_mag.calc_ldos(energy=np.linspace(-2, 2, 500),
+                                     broadening=0.03, position=[0, 0])
+    
+        ldos_strain = kpm_strain.calc_ldos(energy=np.linspace(-2, 2, 500),
+                                           broadening=0.03, position=[0, 0])
+    
+        return np.sqrt(np.mean((ldos_mag.data - ldos_strain.data)**2))
+    
+    results = minimize(ldos_diff,x0=50, method = 'Nelder-Mead')
+    B[i-1] = results['x'][0]
+
+##Prints the strain and B values, to be plotted in Origin
+print(np.linspace(0.0005, 0.01, 20))  #Strain 'c' values
+print(B) #B-Values
