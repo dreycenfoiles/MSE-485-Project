@@ -1,3 +1,7 @@
+##Code to find a proper radius for the lattice such that finite size isn't a concern - will base off of LDOS
+
+##Essentially finds the difference between LDOS at R and R + 1, from R = 10 to R = 51.
+##Takes the mean of the difference at each data point divided by the value at R, plots these for all values R
 R = np.linspace(10, 50, 41)
 errarray = np.zeros(41)
 
@@ -31,7 +35,7 @@ plt.grid()
 
 
 
-##Checks the LDOS Plot for R = 34
+##Checks the LDOS Plot for R = 34, to compare to an "ideal" LDOS
 energy_range = np.linspace(-10, 10, 1000)
 ldos1 = kpmR0.calc_ldos(energy=energy_range, broadening=0.03, position=[0, 0])
 plt.figure(figsize=(12,8))
