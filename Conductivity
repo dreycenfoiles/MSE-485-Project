@@ -1,0 +1,129 @@
+import pybinding as pb
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+from pybinding.constants import phi0
+import inspect
+from pybinding.repository import graphene
+from math import pi
+
+##First, generate the strain and magnetic field lattices
+##The three magnetic fields used are generated from our minimization functions for 'c' = 0.001, 'c' = 0.005, and 'c' = 0.01
+
+model_mag_001 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    constant_magnetic_field(B = 22.34802246)
+)
+
+model_strain_001 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    uniaxial_strain(c = 0.001)
+)
+
+model_mag_005 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    constant_magnetic_field(B = 91.58218384)
+)
+
+model_strain_005 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    uniaxial_strain(c = 0.005)
+)
+
+model_mag_01 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    constant_magnetic_field(B = 111.17218018)
+)
+
+model_strain_01 = pb.Model(
+    graphene.monolayer(),
+    pb.circle(radius=34),
+    uniaxial_strain(c = 0.01)
+)
+
+
+##Generate conductivity plot for ordinary graphene
+sigma = kpm.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma.data *= 4  # to account for spin and valley degeneracy
+
+plt.figure(dpi=300)
+sigma.plot()
+plt.title("$\sigma_{xx}$ of Unstrained Graphene")
+plt.ylim([-1, 5])
+
+
+
+
+
+
+##Generate conductivities for the magnetic field and strain cases, plotting pairs of strains and their counterpart mimicked magnetic field on top of each other
+
+##First, the 'c' = 0.001 case
+kpm_mag_001 = pb.chebyshev.kpm(model_mag_001, kernel=pb.lorentz_kernel())
+sigma_mag_001_xx = kpm_mag_001.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_mag_001_xx.data *= 4  # to account for spin and valley degeneracy
+
+
+kpm_strain_001 = pb.chebyshev.kpm(model_strain_001, kernel=pb.lorentz_kernel())
+sigma_strain_001_xx = kpm_strain_001.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_strain_001_xx.data *= 4  # to account for spin and valley degeneracy
+
+plt.figure(dpi=300)
+sigma_strain_001_xx.plot(label="c = 0.001")
+sigma_mag_001_xx.plot(label="B = 22.348")
+pb.pltutils.legend()
+plt.title("$\sigma_{xx}$ at Strain Scaling of 0.001 vs Equiv. Magnetic Field")
+
+
+
+##Now, the 'c' = 0.005 case
+kpm_mag_005 = pb.chebyshev.kpm(model_mag_005, kernel=pb.lorentz_kernel())
+sigma_mag_005_xx = kpm_mag_005.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_mag_005_xx.data *= 4  # to account for spin and valley degeneracy
+
+kpm_strain_005 = pb.chebyshev.kpm(model_strain_005, kernel=pb.lorentz_kernel())
+sigma_strain_005_xx = kpm_strain_005.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_strain_005_xx.data *= 4  # to account for spin and valley degeneracy
+
+plt.figure(dpi=300)
+sigma_strain_005_xx.plot(label="c = 0.005")
+sigma_mag_005_xx.plot(label="B = 91.582")
+pb.pltutils.legend()
+plt.title("$\sigma_{xx}$ at Strain Scaling of 0.005 vs Equiv. Magnetic Field")
+
+
+
+##Finally, the 'c' = 0.01 case
+kpm_mag_01 = pb.chebyshev.kpm(model_mag_01, kernel=pb.lorentz_kernel())
+sigma_mag_01_xx = kpm_mag_01.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_mag_01_xx.data *= 4  # to account for spin and valley degeneracy
+
+
+kpm_strain_01 = pb.chebyshev.kpm(model_strain_01, kernel=pb.lorentz_kernel())
+sigma_strain_01_xx = kpm_strain_01.calc_conductivity(chemical_potential=np.linspace(-0.5, 0.5, 101),
+                              broadening=0.1, direction='xx', temperature=0,
+                              volume=np.pi*34**2, num_random=10)
+sigma_strain_01_xx.data *= 4  # to account for spin and valley degeneracy
+
+plt.figure(dpi=300)
+sigma_strain_01_xx.plot(label="c = 0.01")
+sigma_mag_01_xx.plot(label="B = 111.172")
+pb.pltutils.legend()
+plt.title("$\sigma_{xx}$ at Strain Scaling of 0.01 vs Equiv. Magnetic Field")
